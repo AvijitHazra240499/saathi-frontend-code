@@ -7,11 +7,11 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge"
 import { Edit, Trash2, ArrowLeft, ExternalLink } from "lucide-react"
 import type { Product } from "@/types/product"
-import EditProductModal from "@/components/edit-product-modal"
+import AddProductModal from "@/components/add-product-modal"
 import DeleteConfirmationModal from "@/components/delete-confirmation-modal"
 import { useToast } from "@/components/ui/use-toast"
 import Link from "next/link"
-import { readMerchantProduct } from "@/app/actions/merchantsProducts"
+import { deleteMerchantProduct, readMerchantProduct, updateMerchantProduct } from "@/app/actions/merchantsProducts"
 import React from "react"
 
 export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -24,7 +24,6 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // In a real app, this would be an API call
     const fetchProduct = async () => {
       setIsLoading(true)
       try {
@@ -54,24 +53,71 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     fetchProduct()
   }, [id, router, toast])
 
-  const handleUpdateProduct = (updatedProduct: Product) => {
-    setProduct(updatedProduct)
-    setIsEditModalOpen(false)
-    toast({
-      title: "Product updated",
-      description: `${updatedProduct.merchantProductName} has been updated successfully.`,
-    })
-  }
+  const handleUpdateProduct = async (updatedProduct: Product) => {
+      try {
+        const result = await updateMerchantProduct(updatedProduct.product_id, {
+          merchantProductName: updatedProduct.merchantProductName,
+          merchantProductDescription: updatedProduct.merchantProductDescription,
+          merchantProductImageUrl: updatedProduct.merchantProductImageUrl,
+          merchantProductUrl: updatedProduct.merchantProductUrl,
+          merchantProductPrice: updatedProduct.merchantProductPrice,
+          merchantProductOfferAmount: updatedProduct.merchantProductOfferAmount,
+          merchantProductStatus: updatedProduct.merchantProductStatus,
+          merchantProductOfferType: updatedProduct.merchantProductOfferType,
+          merchantProductTag: updatedProduct.merchantProductTag,
+          merchantProductParameters: updatedProduct.merchantProductParameters
+        })
+        if (result.success) {
+          setIsEditModalOpen(false)
+          setProduct(updatedProduct)
+          toast({
+            title: "Product updated",
+            description: `${updatedProduct.merchantProductName} has been updated successfully.`,
+          })
+        } else {
+          toast({
+            title: "Error",
+            description: result.error || "Failed to update product. Please try again later.",
+            variant: "destructive",
+          })
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "An error occurred while updating the product.",
+          variant: "destructive",
+        })
+      }
+    }
 
-  const handleDeleteProduct = () => {
-    setIsDeleteModalOpen(false)
-    toast({
-      title: "Product deleted",
-      description: `${product?.merchantProductName} has been deleted successfully.`,
-      variant: "destructive",
-    })
-    router.push("/products")
-  }
+  const handleDeleteProduct = async () => {
+      if (product) {
+        try {
+          const result = await deleteMerchantProduct( product.product_id)
+          if (result.success) {
+            setIsDeleteModalOpen(false)
+            toast({
+              title: "Product deleted",
+              description: `${product.merchantProductName} has been deleted successfully.`,
+              variant: "destructive",
+            })
+            router.push("/products")
+          } else {
+            toast({
+              title: "Error",
+              description: result.error || "Failed to delete product",
+              variant: "destructive",
+            })
+          }
+        } catch (error) {
+          toast({
+            title: "Error",
+            description: "An error occurred while deleting the product",
+            variant: "destructive",
+          })
+        }
+      }
+    }
 
   if (isLoading) {
     return (
@@ -220,8 +266,6 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
           </CardHeader>
           <CardContent className="flex items-center justify-center p-6">
             <div className="w-full aspect-square bg-gray-100 rounded-md flex items-center justify-center">
-              {/* <p className="text-gray-500">Image Preview</p> */}
-              {/* In a real app, you would display the actual image here */}
               <img src={product.merchantProductImageUrl || "/placeholder.svg"} alt={product.merchantProductName} className="max-w-full max-h-full object-contain" />
             </div>
           </CardContent>
@@ -245,16 +289,18 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         </CardHeader>
         <CardContent>
           <p className="text-gray-500 text-center py-8">No related products found</p>
-          {/* In a real app, you would display a list of related products here */}
         </CardContent>
       </Card>
 
       {/* Edit Product Modal */}
-      <EditProductModal
+      <AddProductModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         onUpdate={handleUpdateProduct}
-        product={product}
+        onAdd={()=>{}}
+        productToEdit={product}
+        isEditing={true}
+        lastId={product.product_id}
       />
 
       {/* Delete Confirmation Modal */}

@@ -27,7 +27,6 @@ export default function EditProductModal({ isOpen, onClose, onUpdate, product }:
   const [tagInput, setTagInput] = useState("")
   const [errorMessage, setErrorMessage] = useState("")
 
-  // Reset form when modal opens/closes or when editing a different product
   useEffect(() => {
     if (isOpen && product) {
       setFormData({ ...product })
@@ -97,7 +96,6 @@ export default function EditProductModal({ isOpen, onClose, onUpdate, product }:
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Basic validation
     if (!formData.merchantProductName || !formData.merchantProductDescription || formData.merchantProductPrice <= 0) {
       setErrorMessage("Please fill in all required fields")
       return

@@ -18,7 +18,6 @@ export async function getMerchants() {
     return data
   } catch (error) {
     console.error('Error fetching merchants:', error)
-    // Return the mock data as fallback
     return []
   }
 }

@@ -273,9 +273,7 @@ export default function MerchantsPage() {
               <select
                 className="border rounded px-2 py-1 text-sm"
                 value={itemsPerPage}
-                onChange={(e) => {
-                  // Handle items per page change
-                }}
+                onChange={(e) => {}}
               >
                 <option value="10">10 per page</option>
                 <option value="25">25 per page</option>

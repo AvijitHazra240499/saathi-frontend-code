@@ -147,7 +147,6 @@ export default function AddProductModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Basic validation
     if (!formData.merchantProductName || !formData.merchantProductDescription || formData.merchantProductPrice <= 0) {
       setErrorMessage("Please fill in all required fields")
       return

@@ -49,7 +49,6 @@ export default function AddMerchantModal({
 
   const [errorMessage, setErrorMessage] = useState("")
 
-  // Reset form when modal opens/closes or when editing a different merchant
   useEffect(() => {
     if (isEditing && merchantToEdit) {
       setFormData(merchantToEdit)
@@ -81,7 +80,6 @@ export default function AddMerchantModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Basic validation
     if (!formData.merchantName || !formData.merchantLogoUrl || !formData.merchantUrl) {
       setErrorMessage("Please fill in all required fields")
       return

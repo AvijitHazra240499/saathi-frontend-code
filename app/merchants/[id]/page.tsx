@@ -116,7 +116,6 @@ export default function MerchantDetailPage({ params }: { params: Promise<{ id: s
       })
       setIsAddProductModalOpen(false)
       
-      // Refresh merchant data to show the new product
       const updatedMerchant = await readMerchant(id)
       setMerchant(updatedMerchant.data)
     } catch (error) {
